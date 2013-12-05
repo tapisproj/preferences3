@@ -8,11 +8,11 @@
 # +owner+ is the User record, the +name+ is "color", and the +group+ is the
 # Car record.  This allows preferences to have a sort of context around them.
 class Preference < ActiveRecord::Base
-  belongs_to :owner, :polymorphic => true
-  belongs_to :group, :polymorphic => true
+  belongs_to :owner, polymorphic: true
+  belongs_to :group, polymorphic: true
 
   validates_presence_of :name, :owner_id, :owner_type
-  validates_presence_of :group_type, :if => :group_id?
+  validates_presence_of :group_type, if: :group_id?
 
   class << self
     # Splits the given group into its corresponding id and type. For simple

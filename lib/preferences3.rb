@@ -14,11 +14,11 @@ require 'preference'
 #     preference :notifications
 #   end
 #
-#   u = User.new(:login => 'admin', :prefers_notifications => false)
+#   u = User.new(login: 'admin', prefers_notifications: false)
 #   u.save!
 #
 #   u = User.find_by_login('admin')
-#   u.attributes = {:prefers_notifications => true}
+#   u.attributes = {prefers_notifications: true}
 #   u.save!
 #
 # == Validations
@@ -31,7 +31,7 @@ require 'preference'
 #     preference :color, :string
 #
 #     validates_presence_of :preferred_color
-#     validates_inclusion_of :preferred_color, :in => %w(red green blue)
+#     validates_inclusion_of :preferred_color, in: %w(red green blue)
 #   end
 #
 #   u = User.new
@@ -62,8 +62,8 @@ module Preferences3
     # particular model.
     #
     #   class User < ActiveRecord::Base
-    #     preference :notifications, :default => false
-    #     preference :color, :string, :default => 'red', :group_defaults => {:car => 'black'}
+    #     preference :notifications, default: false
+    #     preference :color, :string, default: 'red', group_defaults: {car: 'black'}
     #     preference :favorite_number, :integer
     #     preference :data, :any # Allows any data type to be stored
     #   end
@@ -91,13 +91,13 @@ module Preferences3
     #
     # Example:
     #
-    #   User.with_preferences(:notifications => true)
-    #   User.with_preferences(:notifications => true, :color => 'blue')
+    #   User.with_preferences(notifications: true)
+    #   User.with_preferences(notifications: true, color: 'blue')
     #
     #   # Searching with group preferences
     #   car = Car.find(:first)
-    #   User.with_preferences(car => {:color => 'blue'})
-    #   User.with_preferences(:notifications => true, car => {:color => 'blue'})
+    #   User.with_preferences(car => {color: 'blue'})
+    #   User.with_preferences(notifications: true, car => {color: 'blue'})
     #
     # == Generated accessors
     #
@@ -156,7 +156,7 @@ module Preferences3
         class_attribute :preference_definitions
         self.preference_definitions = {}
 
-        has_many :stored_preferences, :as => :owner, :class_name => 'Preference'
+        has_many :stored_preferences, as: :owner, class_name: 'Preference'
 
         after_save :update_preferences
 
@@ -275,7 +275,7 @@ module Preferences3
       end
 
       sql = statements.map! {|statement| "(#{statement})"} * ' AND '
-      {:joins => joins, :conditions => values.unshift(sql)}
+      {joins: joins, conditions: values.unshift(sql)}
     end
   end
 
@@ -308,7 +308,7 @@ module Preferences3
 
       unless preferences_group_loaded?(group)
         group_id, group_type = Preference.split_group(group)
-        find_preferences(:group_id => group_id, :group_type => group_type).each do |preference|
+        find_preferences(group_id: group_id, group_type: group_type).each do |preference|
           preferences[preference.name] = preference.value unless preferences.include?(preference.name)
         end
 
@@ -330,7 +330,7 @@ module Preferences3
     # == Examples
     #
     #   class User < ActiveRecord::Base
-    #     preference :color, :string, :default => 'red'
+    #     preference :color, :string, default: 'red'
     #   end
     #
     #   user = User.create
@@ -357,7 +357,7 @@ module Preferences3
     # == Examples
     #
     #   class User < ActiveRecord::Base
-    #     preference :color, :string, :default => 'red'
+    #     preference :color, :string, default: 'red'
     #   end
     #
     #   user = User.create
@@ -378,7 +378,7 @@ module Preferences3
       else
         # Grab the first preference; if it doesn't exist, use the default value
         group_id, group_type = Preference.split_group(group)
-        preference = find_preferences(:name => name, :group_id => group_id, :group_type => group_type).first unless preferences_group_loaded?(group)
+        preference = find_preferences(name: name, group_id: group_id, group_type: group_type).first unless preferences_group_loaded?(group)
 
         value = preference ? preference.value : preference_definitions[name].default_value(group_type)
         preferences_group(group)[name] = value
@@ -585,7 +585,7 @@ module Preferences3
 
             preferences.keys.each do |name|
               # Find an existing preference or build a new one
-              attributes = {:name => name, :group_id => group_id, :group_type => group_type}
+              attributes = {name: name, group_id: group_id, group_type: group_type}
               preference = find_preferences(attributes).first || stored_preferences.build(attributes)
               preference.value = preferred(name, group)
               preference.save!
@@ -605,7 +605,7 @@ module Preferences3
             attributes.all? {|attribute, value| preference[attribute] == value}
           end
         else
-          stored_preferences.find(:all, :conditions => attributes)
+          stored_preferences.find(:all, conditions: attributes)
         end
       end
   end
